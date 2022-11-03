@@ -69,7 +69,7 @@ defmodule Telephony.Core.SubscriberTest do
                full_name: "Gustavo",
                phone_number: "123",
                type: %Prepaid{credits: 8.55, recharges: []},
-               calls: [%Call{time_spent: 1, date: ~D[2022-11-02]}]
+               calls: [%Call{time_spent: 1, date: date}]
              }
   end
 
