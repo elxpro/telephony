@@ -17,4 +17,19 @@ defmodule Telephony.Server do
         {:reply, subcribers, subcribers}
     end
   end
+
+  def handle_call({:search_subscriber, phone_number}, _, subcribers) do
+    subscriber = Core.search_subscriber(subcribers, phone_number)
+    {:reply, subscriber, subcribers}
+  end
+
+  def handle_cast({:make_recharge, phone_number, value, date}, subscribers) do
+    case Core.make_recharge(subscribers, phone_number, value, date) do
+      {:error, _} ->
+        {:noreply, subscribers}
+
+      {subcribers, _} ->
+        {:noreply, subcribers}
+    end
+  end
 end
