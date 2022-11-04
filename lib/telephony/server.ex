@@ -23,6 +23,21 @@ defmodule Telephony.Server do
     {:reply, subscriber, subcribers}
   end
 
+  def handle_call({:make_call, phone_number, time_spent, date}, _, subscribers) do
+    case Core.make_call(subscribers, phone_number, time_spent, date) do
+      {:error, _} = err ->
+        {:reply, err, subscribers}
+
+      {subcribers, subscriber} ->
+        {:reply, subscriber, subcribers}
+    end
+  end
+
+  def handle_call({:print_invoice, phone_number, year, month}, _, subscribers) do
+    invoice = Core.print_invoice(subscribers, phone_number, year, month)
+    {:reply, invoice, subscribers}
+  end
+
   def handle_cast({:make_recharge, phone_number, value, date}, subscribers) do
     case Core.make_recharge(subscribers, phone_number, value, date) do
       {:error, _} ->

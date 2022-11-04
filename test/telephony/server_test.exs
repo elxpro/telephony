@@ -59,4 +59,41 @@ defmodule Telephony.ServerTest do
     subscriber_state = hd(state)
     refute subscriber_state.type.recharges == []
   end
+
+  test "make a success call", %{pid: pid, process_name: process_name, payload: payload} do
+    date = Date.utc_today()
+    phone_number = payload.phone_number
+    time_spent = 10
+
+    GenServer.call(process_name, {:create_subscriber, payload})
+    GenServer.cast(process_name, {:make_recharge, payload.phone_number, 100, date})
+
+    state = :sys.get_state(pid)
+    subscriber_state = hd(state)
+    assert subscriber_state.calls == []
+
+    result = GenServer.call(process_name, {:make_call, phone_number, time_spent, date})
+
+    refute result.calls == []
+  end
+
+  test "make an error call", %{process_name: process_name, payload: payload} do
+    date = Date.utc_today()
+    phone_number = payload.phone_number
+    time_spent = 10
+
+    GenServer.call(process_name, {:create_subscriber, payload})
+    result = GenServer.call(process_name, {:make_call, phone_number, time_spent, date})
+
+    assert result == {:error, "Subscriber does not have credits"}
+  end
+
+  test "print invoice", %{process_name: process_name, payload: payload} do
+    GenServer.call(process_name, {:create_subscriber, payload})
+    date = Date.utc_today()
+    phone_number = payload.phone_number
+
+    result = GenServer.call(process_name, {:print_invoice, phone_number, date.year, date.month})
+    assert result.invoice.calls == []
+  end
 end
