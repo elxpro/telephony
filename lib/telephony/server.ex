@@ -1,5 +1,5 @@
 defmodule Telephony.Server do
-  @behaviour GenServer
+  use GenServer
   alias Telephony.Core
 
   def start_link(server_name) do
@@ -35,6 +35,11 @@ defmodule Telephony.Server do
 
   def handle_call({:print_invoice, phone_number, year, month}, _, subscribers) do
     invoice = Core.print_invoice(subscribers, phone_number, year, month)
+    {:reply, invoice, subscribers}
+  end
+
+  def handle_call({:print_invoices, year, month}, _, subscribers) do
+    invoice = Core.print_invoices(subscribers, year, month)
     {:reply, invoice, subscribers}
   end
 
