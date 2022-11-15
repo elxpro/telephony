@@ -96,4 +96,11 @@ defmodule Telephony.ServerTest do
     result = GenServer.call(process_name, {:print_invoice, phone_number, date.year, date.month})
     assert result.invoice.calls == []
   end
+
+  test "print invoices", %{process_name: process_name, payload: payload} do
+    GenServer.call(process_name, {:create_subscriber, payload})
+    date = Date.utc_today()
+    result = GenServer.call(process_name, {:print_invoices, date.year, date.month})
+    assert result |> hd() |> then(& &1.invoice) == %{calls: [], credits: 0, recharges: []}
+  end
 end
